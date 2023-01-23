@@ -56,8 +56,7 @@ export function hand(holeCards: string[], communityCards: string[]) {
     result.type = 'three-of-a-kind'
   }
   //if straight...
-  if (checkForStraight(combinedHand) === true
-    && checkForFlush(removeValues(combinedHand)) === false) {
+  if (checkForStraight(combinedHand) && checkForFlush(removeValues(combinedHand)) === false) {
     result.type = 'straight'
   }
 
@@ -94,9 +93,8 @@ export function hand(holeCards: string[], communityCards: string[]) {
     result.type = 'four-of-a-kind'
   }
   //if straight-flush
-  if (checkForStraight(combinedHand) === true
-    && checkForFlush(removeValues(combinedHand)) === true) {
-      result.type = checkForStraightFlush(x) === true ? 'straight-flush' : 'flush'
+  if (checkForStraight(combinedHand) && checkForFlush(removeValues(combinedHand)) === true) {
+      result.type = checkForStraightFlush(checkForStraight(combinedHand)) === true ? 'straight-flush' : 'flush'
   }
   return result
   //ranks val can be determined by combining arrays and removing all repeated values (and suits)
@@ -126,7 +124,12 @@ export function hand(holeCards: string[], communityCards: string[]) {
   //option: loop and count occurrences of any opposing suits, if > 2, is not a flush, otherwise it is
 
   // function to be used for checking hand for Straight combinations
-  function checkForStraight(combinedHand: string[]): boolean {
+  function checkForStraight(combinedHand: string[]): number[] | false {
+    /*
+    ['A♠', 'K♦', 'J♥', '5♥', '10♥', 'Q♥', '3♥']
+    {A: '♠', K: ....}
+    {A: 14, K: 13, ...}
+    */
     const values = removeSuits(combinedHand).map((card: string | number) => {
       return card === 'A' ? card = 14 :
         card === 'K' ? card = 13 :
@@ -139,32 +142,36 @@ export function hand(holeCards: string[], communityCards: string[]) {
     //full river + hand now sorted by numerical value in asc order
     //checking for any run of five...
     //start at first value - is next value +1? if yes, add one, and continue - if get to 5, return true
-    function checkRun(sortedArr: number[]): boolean {
+    function checkRun(sortedArr: number[]): number[] | false {
       let run = 0
       let index = 0
       let currentVal = sortedArr[index]
+      let straightArr = []
       while (run !== 5) {
         const nextVal = sortedArr[index + 1]
         if (currentVal + 1 === nextVal) {
           currentVal = nextVal
           if (run === 0) {
             run = 2
+            straightArr.push(currentVal)
           }
           else {
             run++
+            straightArr.push(currentVal)
           }
           index++
         }
         else {
           run *= 0
           currentVal = nextVal
+          straightArr = []
           index++
         }
         if (nextVal === undefined) {
           return false
         }
       }
-      return run === 5 ? true : false
+      return run === 5 ? straightArr : false
     }
     console.log(checkRun(sortedArr))
     return checkRun(sortedArr)
@@ -184,9 +191,42 @@ function removeValues(combinedHand: string[]): string[] {
   })
   return removedValues
 }
-function checkForStraightFlush(straightArr: string[]): boolean {
+function checkForStraightFlush(straightArr: number[]): boolean {
+  // [10, 11, 12, 13, 14]
+  const valuesToCardArr = straightArr.map((value) => {
+    return JSON.stringify(value)
+  })
+  // ['10', '11', '12', '13', '14']
+  const stringsToCardArr = valuesToCardArr.map((value) => {
+    if(value === '11') {
+      return 'J'
+    }
+    if(value === '12') {
+      return 'Q'
+    }
+    if(value === '13') {
+      return 'K'
+    }
+    if(value === '14') {
+      return 'A'
+    }
+    else return value
+  })
+  // ['10', 'J', 'Q', 'K', 'A']
+  //need to get from ^ to => ['10♥', 'J♥', 'Q♥', 'K♦', 'A♠']
+
+    // let finalArr = []
+    /* for(let string of straightArr) {
+          for(let card of combinedHand) {
+            if(card.includes(string)) {
+             finalArr.push(card)
+            }
+          }
+    }
+    // ['10♥', 'J♥', 'Q♥', 'K♦', 'A♠']*/
+    //now check if this straightArr is a flush...?
   const uniqueSuits: string[] = []
-  for (const suit of straightArr) {
+  for (const suit of finalArr) {
     if (!uniqueSuits.includes(suit)) {
       uniqueSuits.push(suit)
     }
@@ -196,7 +236,7 @@ function checkForStraightFlush(straightArr: string[]): boolean {
   }
   else return true
 }
-}
+
 
 console.log(hand(['K♠', 'J♦'], ['J♣', 'K♥', '9♥', '2♥', '3♦']))
 console.log(hand(['A♠', 'K♦'], ['J♥', '5♥', '10♥', 'Q♥', '3♥']))
