@@ -1,4 +1,4 @@
-import { hand, removeSuits } from "./texas-holdem"
+import { checkForStraightFlush, hand, removeSuits } from "./texas-holdem"
 
 test("Hand with no winning cards scores *nothing* and ranks with A,K descending...", () => {
     expect(hand(['K♠', 'A♦'], ['J♣', 'Q♥', '9♥', '2♥', '3♦'])).toEqual({ type: 'nothing', ranks: ['A', 'K', 'Q', 'J', '9'] })
@@ -43,6 +43,14 @@ test("Player scores *straight-flush* and ranks should contain 5 values...", () =
 
 test("removeSuits fn takes an array of cards and removes the suit icons", () => {
     expect(removeSuits(['7♠', '5♠', '9♠', 'J♠', '10♠'])).toEqual(['7', '5', '9', 'J', '10'])
+});
+
+test("checkForStraightFlush fn takes an array of numbers, reverts to array of cards as strings and returns true if flush present", () => {
+    expect(checkForStraightFlush([5, 7, 9, 10, 11], ['8♠', '6♠', '7♠', '5♠', '9♠', 'J♠', '10♠'])).toEqual(true)
+});
+
+test("checkForStraightFlush fn takes an array of numbers, reverts to array of cards as strings and returns false if no flush", () => {
+    expect(checkForStraightFlush([10, 11, 12, 13, 14], ['A♠', 'K♦', 'J♥', '5♥', '10♥', 'Q♥', '3♥'])).toEqual(false)
 });  
 
 

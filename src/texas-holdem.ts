@@ -30,7 +30,7 @@ export function hand(holeCards: string[], communityCards: string[]) {
 
   //if nothing
   if (Object.keys(occurrencesObj).length === 0
-    && checkForStraight(combinedHand) === false
+    && checkForStraight(combinedHand).length === 0
     && checkForFlush(combinedHand) === false) {
     result.type = 'nothing'
   }
@@ -56,12 +56,12 @@ export function hand(holeCards: string[], communityCards: string[]) {
     result.type = 'three-of-a-kind'
   }
   //if straight...
-  if (checkForStraight(combinedHand) && checkForFlush(removeValues(combinedHand)) === false) {
+  if (checkForStraight(combinedHand).length > 1 && checkForFlush(removeValues(combinedHand)) === false) {
     result.type = 'straight'
   }
 
   //if flush...
-  if (checkForStraight(combinedHand) === false
+  if (checkForStraight(combinedHand).length === 0
     && checkForFlush(removeValues(combinedHand)) === true) {
     result.type = 'flush'
   }
@@ -93,8 +93,8 @@ export function hand(holeCards: string[], communityCards: string[]) {
     result.type = 'four-of-a-kind'
   }
   //if straight-flush
-  if (checkForStraight(combinedHand) && checkForFlush(removeValues(combinedHand)) === true) {
-      result.type = checkForStraightFlush(checkForStraight(combinedHand)) === true ? 'straight-flush' : 'flush'
+  if (checkForStraight(combinedHand).length > 1 && checkForFlush(removeValues(combinedHand))) {
+      result.type = checkForStraightFlush(checkForStraight(combinedHand), combinedHand) === true ? 'straight-flush' : 'flush'
   }
   return result
   //ranks val can be determined by combining arrays and removing all repeated values (and suits)
@@ -124,7 +124,7 @@ export function hand(holeCards: string[], communityCards: string[]) {
   //option: loop and count occurrences of any opposing suits, if > 2, is not a flush, otherwise it is
 
   // function to be used for checking hand for Straight combinations
-  function checkForStraight(combinedHand: string[]): number[] | false {
+  function checkForStraight(combinedHand: string[]): number[]{
     /*
     ['A♠', 'K♦', 'J♥', '5♥', '10♥', 'Q♥', '3♥']
     {A: '♠', K: ....}
@@ -142,7 +142,7 @@ export function hand(holeCards: string[], communityCards: string[]) {
     //full river + hand now sorted by numerical value in asc order
     //checking for any run of five...
     //start at first value - is next value +1? if yes, add one, and continue - if get to 5, return true
-    function checkRun(sortedArr: number[]): number[] | false {
+    function checkRun(sortedArr: number[]): number[]{
       let run = 0
       let index = 0
       let currentVal = sortedArr[index]
@@ -168,10 +168,10 @@ export function hand(holeCards: string[], communityCards: string[]) {
           index++
         }
         if (nextVal === undefined) {
-          return false
+          return []
         }
       }
-      return run === 5 ? straightArr : false
+      return run === 5 ? straightArr : []
     }
     console.log(checkRun(sortedArr))
     return checkRun(sortedArr)
@@ -191,7 +191,7 @@ function removeValues(combinedHand: string[]): string[] {
   })
   return removedValues
 }
-function checkForStraightFlush(straightArr: number[]): boolean {
+export function checkForStraightFlush(straightArr: number[], combinedHand: string[]): boolean {
   // [10, 11, 12, 13, 14]
   const valuesToCardArr = straightArr.map((value) => {
     return JSON.stringify(value)
@@ -215,18 +215,19 @@ function checkForStraightFlush(straightArr: number[]): boolean {
   // ['10', 'J', 'Q', 'K', 'A']
   //need to get from ^ to => ['10♥', 'J♥', 'Q♥', 'K♦', 'A♠']
 
-    // let finalArr = []
-    /* for(let string of straightArr) {
+    let originalCardsArr = []
+     for(let string of stringsToCardArr) {
           for(let card of combinedHand) {
             if(card.includes(string)) {
-             finalArr.push(card)
+             originalCardsArr.push(card)
             }
           }
     }
-    // ['10♥', 'J♥', 'Q♥', 'K♦', 'A♠']*/
+    // ['10♥', 'J♥', 'Q♥', 'K♦', 'A♠']
     //now check if this straightArr is a flush...?
+    let originalSuits = removeValues(originalCardsArr)
   const uniqueSuits: string[] = []
-  for (const suit of finalArr) {
+  for (const suit of originalSuits) {
     if (!uniqueSuits.includes(suit)) {
       uniqueSuits.push(suit)
     }
