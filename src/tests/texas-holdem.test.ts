@@ -1,4 +1,4 @@
-import { checkForStraightFlush, hand, removeSuits } from "./texas-holdem";
+import hand from "../texas-holdem";
 
 test("Hand with no winning cards scores *nothing* and ranks with A,K descending...", () => {
   expect(hand(["K♠", "A♦"], ["J♣", "Q♥", "9♥", "2♥", "3♦"])).toEqual({
@@ -42,11 +42,6 @@ test("Player scores *flush* and ranks should contain 5 values...", () => {
   });
 });
 
-/*
-straight: 10♥, J♥, Q♥, K♦, A♠ -- suit doesnt matter, 10, 11, 12, 13, 14
-flush: J♥, 5♥, 10♥, Q♥, 3♥ -- values dont matter, 5 ♥'s
-*/
-
 test("Player scores *full house* and ranks should contain 2 values...", () => {
   expect(hand(["A♠", "A♦"], ["K♣", "K♥", "A♥", "Q♥", "3♦"])).toEqual({
     type: "full house",
@@ -66,34 +61,6 @@ test("Player scores *straight-flush* and ranks should contain 5 values...", () =
     type: "straight-flush",
     ranks: ["J", "10", "9", "8", "7"],
   });
-});
-
-test("removeSuits fn takes an array of cards and removes the suit icons", () => {
-  expect(removeSuits(["7♠", "5♠", "9♠", "J♠", "10♠"])).toEqual([
-    "7",
-    "5",
-    "9",
-    "J",
-    "10",
-  ]);
-});
-
-test("checkForStraightFlush fn takes an array of numbers, reverts to array of cards as strings and returns true if flush present", () => {
-  expect(
-    checkForStraightFlush(
-      [5, 7, 9, 10, 11],
-      ["8♠", "6♠", "7♠", "5♠", "9♠", "J♠", "10♠"]
-    )
-  ).toEqual(true);
-});
-
-test("checkForStraightFlush fn takes an array of numbers, reverts to array of cards as strings and returns false if no flush", () => {
-  expect(
-    checkForStraightFlush(
-      [10, 11, 12, 13, 14],
-      ["A♠", "K♦", "J♥", "5♥", "10♥", "Q♥", "3♥"]
-    )
-  ).toEqual(false);
 });
 
 // test("", () => {
