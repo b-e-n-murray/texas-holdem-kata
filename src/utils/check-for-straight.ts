@@ -1,7 +1,7 @@
 import checkRun from "./check-for-run";
 import removeSuits from "./remove-suits";
 
-function checkForStraight(combinedHand: string[]): number[] {
+function checkForStraight(combinedHand: string[]): {} {
   const values = removeSuits(combinedHand).map((card: string | number) => {
     return card === "A"
       ? (card = 14)

@@ -28,7 +28,7 @@ function hand(holeCards: string[], communityCards: string[]) {
   //if nothing
   if (
     Object.keys(occurrencesObj).length === 0 &&
-    checkForStraight(combinedHand).length === 0 &&
+    Object.keys(checkForStraight(combinedHand)).length === 0 &&
     checkForFlush(combinedHand) === false
   ) {
     result.type = "nothing";
@@ -62,7 +62,7 @@ function hand(holeCards: string[], communityCards: string[]) {
   }
   //if straight...
   if (
-    checkForStraight(combinedHand).length > 1 &&
+    Object.keys(checkForStraight(combinedHand)).length === 1 &&
     checkForFlush(removeValues(combinedHand)) === false
   ) {
     result.type = "straight";
@@ -70,7 +70,7 @@ function hand(holeCards: string[], communityCards: string[]) {
 
   //if flush...
   if (
-    checkForStraight(combinedHand).length === 0 &&
+    Object.keys(checkForStraight(combinedHand)).length === 0 &&
     checkForFlush(removeValues(combinedHand)) === true
   ) {
     result.type = "flush";
@@ -112,7 +112,7 @@ function hand(holeCards: string[], communityCards: string[]) {
   }
   //if straight-flush
   if (
-    checkForStraight(combinedHand).length > 1 &&
+    Object.keys(checkForStraight(combinedHand)).length > 1 &&
     checkForFlush(removeValues(combinedHand))
   ) {
     result.type =
