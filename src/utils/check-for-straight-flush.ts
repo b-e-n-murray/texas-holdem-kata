@@ -1,10 +1,13 @@
 import removeValues from "./remove-values";
 
 function checkForStraightFlush(
-  straightArr: number[],
+  straightsObj: Record<number, number[]>,
   combinedHand: string[]
 ): boolean {
   // [10, 11, 12, 13, 14]
+  for(let straight of straightsObj) {
+
+  }
   const valuesToCardArr = straightArr.map((value) => {
     return JSON.stringify(value);
   });
